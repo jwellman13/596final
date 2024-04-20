@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class StateMachine
 {
@@ -18,7 +16,7 @@ public class StateMachine
         var transition = GetTransition();
         if (transition != null)
         {
-            SetState(transition.toState);
+            SetState(transition.ToState);
         }
 
         currentState?.Tick();
@@ -26,48 +24,43 @@ public class StateMachine
 
     public void SetState(IState state)
     {
-        if (state == currentState)
-        {
-            return;
-        }
+        if (state == currentState) return;
 
         currentState?.OnExit();
         currentState = state;
 
         transitions.TryGetValue(currentState.GetType(), out currentTransitions);
 
-        if (currentTransitions == null)
-        {
-            currentTransitions = EmptyTransitions;
-        }
+        if (currentTransitions == null) currentTransitions = EmptyTransitions;
 
         currentState.OnEnter();
     }
 
-
-    void AddTransition(IState current, IState destination, bool condition)
+    public void AddTransition(IState from, IState to, bool condition)
     {
-        if (transitions.TryGetValue(current.GetType(), out var transitions) == false)
+        if (transitions.TryGetValue(from.GetType(), out var trans) == false)
         {
-            transitions = new List<Transition>();
-            transitions[from.get]
+            trans = new List<Transition>();
+            transitions[from.GetType()] = trans;
         }
+
+        trans.Add(new Transition(to, condition));
     }
 
-    void AddAnyTransition(IState destination, bool condition)
+    public void AddAnyTransition(IState destination, bool condition)
     {
-
+        anyTransitions.Add(new Transition(destination, condition));
     }
 
     private class Transition
     {
-        public bool condition;
-        public IState toState;
+        public bool Condition;
+        public IState ToState;
 
         public Transition(IState destination, bool condition)
         {
-            toState = destination;
-            this.condition = condition;
+            ToState = destination;
+            Condition = condition;
         }
     }
 
@@ -75,13 +68,15 @@ public class StateMachine
     {
         foreach(var transition in anyTransitions)
         {
-            if (transition.condition)
-            {
-                return transition;
-            }
+            if (transition.Condition) return transition;
         }
 
-        foreach(var transition in cur)
+        foreach(var transition in currentTransitions)
+        {
+            if (transition.Condition) return transition;
+        }
+
+        return null;
     }
 }
 
