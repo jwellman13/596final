@@ -621,6 +621,9 @@ MonoBehaviour:
   jumpMagnitude: 5
   extraJumps: 1
   groundCheckDistance: 0.1
+  dashingForce: 10
+  dashingTime: 0.2
+  dashCooldown: 1
   groundCheckPos: {fileID: 436264894}
   groundLayer:
     serializedVersion: 2

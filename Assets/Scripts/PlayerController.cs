@@ -10,6 +10,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float jumpMagnitude = 2.0f;
     [SerializeField] int extraJumps = 1;
     [SerializeField] float groundCheckDistance = 0.1f;
+    [SerializeField] float dashingForce = 10f;
+    [SerializeField] float dashingTime = 0.5f;
+    [SerializeField] float dashCooldown = 1f;
 
     // Assigned in editor
     [SerializeField] Transform groundCheckPos;
@@ -22,8 +25,11 @@ public class PlayerController : MonoBehaviour
 
 
     // State-based checking
+    private bool isFacingRight = false;
     private bool isGrounded;
     private bool isJumpButtonPressed;
+    private bool canDash = true;
+    private bool isDashing = false;
 
     // Start is called before the first frame update
     void Start()
@@ -34,6 +40,13 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isDashing) return;
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canDash)
+        {
+            StartCoroutine(Dash());
+        }
+
         horizontalMove = Input.GetAxisRaw("Horizontal");
 
         // Sets the player rotation to face the correct direction
@@ -42,6 +55,15 @@ public class PlayerController : MonoBehaviour
             float setFacing = Mathf.Atan2(horizontalMove, 0) * Mathf.Rad2Deg;
             Quaternion targetRotation = Quaternion.Euler(0, setFacing, 0);
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+
+            if (setFacing < 0)
+            {
+                isFacingRight = false;
+            }
+            else
+            {
+                isFacingRight = true;
+            }
         }
 
         if (Input.GetButtonDown("Jump"))
@@ -60,6 +82,10 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isDashing) return;
+        {
+
+        }
         isGrounded = Physics.Raycast(groundCheckPos.position, Vector3.down, groundCheckDistance, groundLayer);
         rb.velocity = new Vector3(horizontalMove * playerSpeed, rb.velocity.y, 0);
 
@@ -69,5 +95,28 @@ public class PlayerController : MonoBehaviour
             extraJumps--;
             isJumpButtonPressed = false;
         }
+    }
+
+
+
+    private IEnumerator Dash()
+    {
+        canDash = false;
+        isDashing = true;
+        rb.useGravity = false;
+        float dir = 1f;
+        if (!isFacingRight)
+        {
+            dir = -1f;
+        }
+        rb.velocity = new Vector2(transform.localScale.x * dashingForce * dir, 0f);
+
+        yield return new WaitForSeconds(dashingTime);
+
+        rb.useGravity = true;
+        isDashing = false;
+
+        yield return new WaitForSeconds(dashCooldown);
+        canDash = true;
     }
 }
