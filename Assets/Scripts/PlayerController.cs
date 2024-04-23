@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
 
     // Internal variables
     private Rigidbody rb;
+    private Animator anim;
     private float horizontalMove;
 
 
@@ -35,6 +36,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        anim = GetComponentInChildren<Animator>();
     }
 
     // Update is called once per frame
@@ -48,6 +50,8 @@ public class PlayerController : MonoBehaviour
         }
 
         horizontalMove = Input.GetAxisRaw("Horizontal");
+
+        anim.SetFloat("Speed", Mathf.Abs(horizontalMove));
 
         // Sets the player rotation to face the correct direction
         if (horizontalMove != 0)
@@ -92,6 +96,7 @@ public class PlayerController : MonoBehaviour
         if (isJumpButtonPressed && extraJumps > 0)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpMagnitude, 0);
+            anim.SetTrigger("JumpTrigger");
             extraJumps--;
             isJumpButtonPressed = false;
         }
