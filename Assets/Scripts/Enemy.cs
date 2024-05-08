@@ -13,8 +13,8 @@ public class Enemy : MonoBehaviour, ITakeDamage
     public SO_Enemy enemyData;
 
     private int health;
-    private int damage;
-    private float speed;
+    protected int damage;
+    protected float speed;
 
     // Flags
     bool isMarkedToDestroy = false;
@@ -48,6 +48,7 @@ public class Enemy : MonoBehaviour, ITakeDamage
 
     public bool TakeDamage(int amount)
     {
+        Debug.Log("Ouch");
         health -= amount;
         isMarkedToDestroy = true;
         return health > 0;
@@ -55,6 +56,7 @@ public class Enemy : MonoBehaviour, ITakeDamage
 
     private void Die()
     {
+        Destroy(gameObject);
         Debug.Log(name + " died!");
     }
 }

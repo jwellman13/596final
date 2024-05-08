@@ -13,10 +13,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float dashingForce = 10f;
     [SerializeField] float dashingTime = 0.5f;
     [SerializeField] float dashCooldown = 1f;
+    [SerializeField] float weaponCooldown = 0.3f;
 
     // Assigned in editor
     [SerializeField] Transform groundCheckPos;
     [SerializeField] LayerMask groundLayer;
+    [SerializeField] GameObject kunai;
+    [SerializeField] Transform firePos;
+    [SerializeField] AudioSource jumpSFX;
+    [SerializeField] AudioSource dashSFX;
+    [SerializeField] AudioSource footstepsSFX;
 
 
     // Internal variables
@@ -31,6 +37,7 @@ public class PlayerController : MonoBehaviour
     private bool isJumpButtonPressed;
     private bool canDash = true;
     private bool isDashing = false;
+    private bool canFire = true;
 
     // Start is called before the first frame update
     void Start()
@@ -43,6 +50,11 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (isDashing) return;
+
+        if (Input.GetKey(KeyCode.E) && canFire)
+        {
+            StartCoroutine(Fire());
+        }
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && canDash)
         {
@@ -74,13 +86,24 @@ public class PlayerController : MonoBehaviour
         {
             if (isGrounded || extraJumps > 0)
             {
+                anim.SetBool("Grounded", false);
                 isJumpButtonPressed = true;
             }
         }
 
         if (isGrounded)
         {
+            anim.SetBool("Grounded",true);
             extraJumps = 1;
+        }
+
+        if (isGrounded && horizontalMove != 0)
+        {
+            footstepsSFX.enabled = true;
+        }
+        else
+        {
+            footstepsSFX.enabled = false;
         }
     }
 
@@ -97,8 +120,10 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpMagnitude, 0);
             anim.SetTrigger("JumpTrigger");
+            jumpSFX.Play();
             extraJumps--;
             isJumpButtonPressed = false;
+            
         }
     }
 
@@ -116,6 +141,8 @@ public class PlayerController : MonoBehaviour
         }
         rb.velocity = new Vector2(transform.localScale.x * dashingForce * dir, 0f);
 
+        dashSFX.Play();
+
         yield return new WaitForSeconds(dashingTime);
 
         rb.useGravity = true;
@@ -123,5 +150,20 @@ public class PlayerController : MonoBehaviour
 
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
+    }
+
+    private IEnumerator Fire()
+    {
+        Debug.Log("Fire");
+        canFire = false;
+        GameObject go = Instantiate(kunai, firePos.position, Quaternion.identity);
+        Projectile proj = go.GetComponent<Projectile>();
+        proj.Fire(transform.forward);
+        proj.SetFacing(isFacingRight);
+
+
+        yield return new WaitForSeconds(weaponCooldown);
+
+        canFire = true;
     }
 }
