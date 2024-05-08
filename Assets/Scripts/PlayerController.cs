@@ -20,6 +20,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     [SerializeField] GameObject kunai;
     [SerializeField] Transform firePos;
+    [SerializeField] AudioSource jumpSFX;
+    [SerializeField] AudioSource dashSFX;
+    [SerializeField] AudioSource footstepsSFX;
 
 
     // Internal variables
@@ -83,13 +86,24 @@ public class PlayerController : MonoBehaviour
         {
             if (isGrounded || extraJumps > 0)
             {
+                anim.SetBool("Grounded", false);
                 isJumpButtonPressed = true;
             }
         }
 
         if (isGrounded)
         {
+            anim.SetBool("Grounded",true);
             extraJumps = 1;
+        }
+
+        if (isGrounded && horizontalMove != 0)
+        {
+            footstepsSFX.enabled = true;
+        }
+        else
+        {
+            footstepsSFX.enabled = false;
         }
     }
 
@@ -106,8 +120,10 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpMagnitude, 0);
             anim.SetTrigger("JumpTrigger");
+            jumpSFX.Play();
             extraJumps--;
             isJumpButtonPressed = false;
+            
         }
     }
 
@@ -124,6 +140,8 @@ public class PlayerController : MonoBehaviour
             dir = -1f;
         }
         rb.velocity = new Vector2(transform.localScale.x * dashingForce * dir, 0f);
+
+        dashSFX.Play();
 
         yield return new WaitForSeconds(dashingTime);
 

@@ -10,6 +10,11 @@ public class EnemyThrowItem : MonoBehaviour
 
     private bool hasThrown = false;
 
+    private void Awake()
+    {
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+    }
+
     void Update()
     {
         // Check if the player is within the throw distance and the item has not been thrown yet

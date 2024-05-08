@@ -42,5 +42,6 @@ public class Geisha : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         // Handle collision logic if needed
+
     }
 }

@@ -48,6 +48,7 @@ public class Enemy : MonoBehaviour, ITakeDamage
 
     public bool TakeDamage(int amount)
     {
+        Debug.Log("Ouch");
         health -= amount;
         isMarkedToDestroy = true;
         return health > 0;
@@ -55,6 +56,7 @@ public class Enemy : MonoBehaviour, ITakeDamage
 
     private void Die()
     {
+        Destroy(gameObject);
         Debug.Log(name + " died!");
     }
 }
