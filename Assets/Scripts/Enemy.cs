@@ -13,8 +13,8 @@ public class Enemy : MonoBehaviour, ITakeDamage
     public SO_Enemy enemyData;
 
     private int health;
-    private int damage;
-    private float speed;
+    protected int damage;
+    protected float speed;
 
     // Flags
     bool isMarkedToDestroy = false;
