@@ -7,12 +7,16 @@ public class EnemyThrowItem : MonoBehaviour
     public Transform throwPosition; // Position from which the enemy will throw the item
     public float throwDistance = 5f; // Distance threshold for throwing the item
     public float throwForce = 10f; // Force to throw the item
+    public float throwCooldown = 2.0f;
+
+    private Animator anim;
 
     private bool hasThrown = false;
 
     private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        anim = GetComponent<Animator>();
     }
 
     void Update()
@@ -32,6 +36,9 @@ public class EnemyThrowItem : MonoBehaviour
 
         // Calculate the direction to throw the item
         Vector3 throwDirection = (player.position - throwPosition.position).normalized;
+
+        // Trigger throw animation
+        anim.SetTrigger("Throw");
 
         // Apply force to the item to throw it towards the player
         Rigidbody itemRigidbody = item.GetComponent<Rigidbody>();
@@ -55,7 +62,7 @@ public class EnemyThrowItem : MonoBehaviour
     System.Collections.IEnumerator DestroyItemCoroutine(GameObject item)
     {
         // Wait for a short delay
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(throwCooldown);
 
         // Destroy the item
         Destroy(item);

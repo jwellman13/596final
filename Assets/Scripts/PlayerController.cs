@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, ITakeDamage
 {
+    public UnityEvent UpdateHealth;
+
     // Available in editor
     [SerializeField] float playerSpeed = 2.0f;
     [SerializeField] float rotationSpeed = 20.0f;
@@ -14,6 +18,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float dashingTime = 0.5f;
     [SerializeField] float dashCooldown = 1f;
     [SerializeField] float weaponCooldown = 0.3f;
+    [SerializeField] int playerHealth = 10;
 
     // Assigned in editor
     [SerializeField] Transform groundCheckPos;
@@ -38,6 +43,7 @@ public class PlayerController : MonoBehaviour
     private bool canDash = true;
     private bool isDashing = false;
     private bool canFire = true;
+    private bool isInvuln = false;
 
     // Start is called before the first frame update
     void Start()
@@ -105,6 +111,11 @@ public class PlayerController : MonoBehaviour
         {
             footstepsSFX.enabled = false;
         }
+
+        if (playerHealth <= 0)
+        {
+            SceneManager.LoadScene("Title");
+        }
     }
 
     private void FixedUpdate()
@@ -165,5 +176,29 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(weaponCooldown);
 
         canFire = true;
+    }
+
+    public bool TakeDamage(int amount)
+    {
+        if (isInvuln) return playerHealth > 0;
+        Debug.Log("Player takes " + amount + " damage.");
+        playerHealth -= amount;
+        UpdateHealth?.Invoke();
+        StartCoroutine(PlayerInvulnerable());
+        return playerHealth > 0;
+    }
+
+    IEnumerator PlayerInvulnerable()
+    {
+        isInvuln = true;
+
+        yield return new WaitForSeconds(1.0f);
+
+        isInvuln = false;
+    }
+
+    public int GetHealth()
+    {
+        return playerHealth;
     }
 }

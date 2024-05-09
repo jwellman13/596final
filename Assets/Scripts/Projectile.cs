@@ -17,6 +17,7 @@ public class Projectile : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        
         StartCoroutine(DestroyOverTime());
     }
 

@@ -2,18 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Samurai : Enemy
+public class Sensei : Enemy
 {
     private bool isRight = false;
     private bool readyToSwap = true;
-    private float swapCooldown = 8.0f;
+    private float swapCooldown = 2.0f;
+
 
     // Start is called before the first frame update
     void Start()
     {
-
+        
     }
 
+    // Update is called once per frame
     void Update()
     {
         if (isMarkedToDestroy)
@@ -33,7 +35,7 @@ public class Samurai : Enemy
         {
             StartCoroutine(Swap());
         }
-
+        
     }
 
     IEnumerator Swap()
