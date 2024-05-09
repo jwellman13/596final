@@ -10,6 +10,8 @@ using UnityEngine;
 /// </summary>
 public class Enemy : MonoBehaviour, ITakeDamage
 {
+
+    [SerializeField] AudioSource hurtSFX;
     public SO_Enemy enemyData;
 
     private int health;
@@ -17,7 +19,7 @@ public class Enemy : MonoBehaviour, ITakeDamage
     protected float speed;
 
     // Flags
-    bool isMarkedToDestroy = false;
+    protected bool isMarkedToDestroy = false;
 
     private void Awake()
     {
@@ -35,6 +37,7 @@ public class Enemy : MonoBehaviour, ITakeDamage
         // Check for death
         if (isMarkedToDestroy)
         {
+            Debug.Log("Kill");
             Die();
         }
     }
@@ -50,13 +53,22 @@ public class Enemy : MonoBehaviour, ITakeDamage
     {
         Debug.Log("Ouch");
         health -= amount;
-        isMarkedToDestroy = true;
+        if (health <= 0)
+        {
+            if (hurtSFX != null)
+            {
+                hurtSFX.Play();
+
+            }
+            isMarkedToDestroy = true;
+        }
         return health > 0;
     }
 
     private void Die()
     {
-        Destroy(gameObject);
+
+        Destroy(gameObject, 0.5f);
         Debug.Log(name + " died!");
     }
 }

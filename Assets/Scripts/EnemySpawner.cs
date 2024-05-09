@@ -6,6 +6,7 @@ public class EnemySpawner : MonoBehaviour
 {
     // Available in editor
     [SerializeField] float spawnCooldown = 3.0f;
+    public int maxEnemies = 5;
 
     // Assigned in editor
     [SerializeField] GameObject enemyPrefab;
@@ -23,9 +24,11 @@ public class EnemySpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (canSpawn)
+        if (canSpawn && maxEnemies > 0)
         {
             StartCoroutine(SpawnEnemy());
+            maxEnemies--;
+
         }
     }
 
@@ -33,6 +36,7 @@ public class EnemySpawner : MonoBehaviour
     {
         canSpawn = false;
         GameObject go = Instantiate(enemyPrefab,transform.position, Quaternion.identity);
+
 
         yield return new WaitForSeconds(spawnCooldown);
         canSpawn = true;
